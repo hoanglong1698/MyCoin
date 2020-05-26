@@ -1,0 +1,23 @@
+{
+  "name": "MyCoin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoanglong1698/MyCoin.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hoanglong1698/MyCoin/issues"
+  },
+  "homepage": "https://github.com/hoanglong1698/MyCoin#readme",
+  "dependencies": {
+    "crypto-js": "^4.0.0"
+  }
+}
