@@ -1,4 +1,5 @@
 import * as CryptoJS from 'crypto-js';
+import { broadcastLatest } from './p2p';
 
 //cấu trúc 1 block
 class Block {
@@ -40,7 +41,15 @@ const generateNextBlock = (blockData: string) => {
     const nextTimestamp: number = new Date().getTime() / 1000;
     const nextHash: string = calculateHash(nextIndex, previousBlock.hash, nextTimestamp, blockData);
     const newBlock: Block = new Block(nextIndex, nextHash, previousBlock.hash, nextTimestamp, blockData);
+    addBlock(newBlock);
+    broadcastLatest();
     return newBlock;
+};
+
+const addBlock = (newBlock: Block) => {
+    if (isValidNewBlock(newBlock, getLatestBlock())) {
+        blockchain.push(newBlock);
+    }
 };
 
 //Hàm kiểm tra block mới có đúng hay không
@@ -95,8 +104,20 @@ const replaceChain = (newBlocks: Block[]) => {
     if (isValidChain(newBlocks) && newBlocks.length > getBlockchain().length) {
         console.log('Received blockchain is valid. Replacing current blockchain with received blockchain');
         blockchain = newBlocks;
-        //broadcastLatest();
+        broadcastLatest();
     } else {
         console.log('Received blockchain invalid');
     }
 };
+
+const addBlockToChain = (newBlock: Block) => {
+    if (isValidNewBlock(newBlock, getLatestBlock())) {
+        blockchain.push(newBlock);
+        return true;
+    }
+    return false;
+};
+
+
+
+export {Block, getBlockchain, getLatestBlock, generateNextBlock, isValidBlockStructure, replaceChain, addBlockToChain};
