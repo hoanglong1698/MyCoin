@@ -18,3 +18,14 @@ class Block {
     }
 }
 
+//Block đầu tiên (set giá trị tĩnh)
+const genesisBlock: Block = new Block(
+    0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7', null, 1465154705, 'my genesis block!!'
+);
+
+let blockchain: Block[] = [genesisBlock]; //Tạm thời dùng mảng tĩnh để lưu các block
+
+const getLatestBlock = (): Block => blockchain[blockchain.length - 1];//Hàm lấy block mới nhất
+
+const getBlockchain = (): Block[] => blockchain; //Hàm lấy danh sách block hiện tại
+
