@@ -44,3 +44,15 @@ class Transaction {
     public txOuts: TxOut[];
 }
 
+//Hàm tính id của một transaction
+const getTransactionId = (transaction: Transaction): string => {
+    const txInContent: string = transaction.txIns
+        .map((txIn: TxIn) => txIn.txOutId + txIn.txOutIndex)
+        .reduce((a, b) => a + b, '');
+
+    const txOutContent: string = transaction.txOuts
+        .map((txOut: TxOut) => txOut.address + txOut.amount)
+        .reduce((a, b) => a + b, '');
+
+    return CryptoJS.SHA256(txInContent + txOutContent).toString();
+};
