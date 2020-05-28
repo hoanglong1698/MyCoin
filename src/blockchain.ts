@@ -182,13 +182,22 @@ const hashMatchesBlockContent = (block: Block): boolean => {
 
 //Hàm xử lý khi có 2 node cùng generate ra 1 block (lấy chain dài hơn để nối vào)
 const replaceChain = (newBlocks: Block[]) => {
-    if (isValidChain(newBlocks) && newBlocks.length > getBlockchain().length) {
+
+    if (isValidChain(newBlocks) &&
+        getAccumulatedDifficulty(newBlocks) > getAccumulatedDifficulty(getBlockchain())) {
         console.log('Received blockchain is valid. Replacing current blockchain with received blockchain');
         blockchain = newBlocks;
         broadcastLatest();
     } else {
         console.log('Received blockchain invalid');
     }
+};
+
+const getAccumulatedDifficulty = (aBlockchain: Block[]): number => {
+    return aBlockchain
+        .map((block) => block.difficulty)
+        .map((difficulty) => Math.pow(2, difficulty))
+        .reduce((a, b) => a + b);
 };
 
 //Hàm thêm một block mới vào chain
