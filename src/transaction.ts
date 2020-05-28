@@ -177,3 +177,17 @@ const isValidAddress = (address: string): boolean => {
     }
     return true;
 };
+
+//Hàm xác thực đối tượng TxIn phải đúng và có đầu ra tham chiếu
+const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
+    const referencedUTxOut: UnspentTxOut =
+        aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutId === txIn.txOutId);
+    if (referencedUTxOut == null) {
+        console.log('referenced txOut not found: ' + JSON.stringify(txIn));
+        return false;
+    }
+    const address = referencedUTxOut.address;
+
+    const key = ec.keyFromPublic(address, 'hex');
+    return key.verify(transaction.id, txIn.signature);
+};
