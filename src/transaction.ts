@@ -178,7 +178,7 @@ const isValidAddress = (address: string): boolean => {
     return true;
 };
 
-//Hàm xác thực đối tượng TxIn phải đúng và có đầu ra tham chiếu
+//Hàm xác thực đối tượng TxIn phải đúng và có txOut chưa sử dụng
 const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
     const referencedUTxOut: UnspentTxOut =
         aUnspentTxOuts.find((uTxO) => uTxO.txOutId === txIn.txOutId && uTxO.txOutId === txIn.txOutId);
@@ -190,4 +190,39 @@ const validateTxIn = (txIn: TxIn, transaction: Transaction, aUnspentTxOuts: Unsp
 
     const key = ec.keyFromPublic(address, 'hex');
     return key.verify(transaction.id, txIn.signature);
+};
+
+const validateTransaction = (transaction: Transaction, aUnspentTxOuts: UnspentTxOut[]): boolean => {
+
+    if (getTransactionId(transaction) !== transaction.id) {
+        console.log('invalid tx id: ' + transaction.id);
+        return false;
+    }
+    const hasValidTxIns: boolean = transaction.txIns
+        .map((txIn) => validateTxIn(txIn, transaction, aUnspentTxOuts))
+        .reduce((a, b) => a && b, true);
+
+    if (!hasValidTxIns) {
+        console.log('some of the txIns are invalid in tx: ' + transaction.id);
+        return false;
+    }
+
+    const totalTxInValues: number = transaction.txIns
+        .map((txIn) => getTxInAmount(txIn, aUnspentTxOuts))
+        .reduce((a, b) => (a + b), 0);
+
+    const totalTxOutValues: number = transaction.txOuts
+        .map((txOut) => txOut.amount)
+        .reduce((a, b) => (a + b), 0);
+
+    if (totalTxOutValues !== totalTxInValues) {
+        console.log('totalTxOutValues !== totalTxInValues in tx: ' + transaction.id);
+        return false;
+    }
+
+    return true;
+};
+
+const getTxInAmount = (txIn: TxIn, aUnspentTxOuts: UnspentTxOut[]): number => {
+    return findUnspentTxOut(txIn.txOutId, txIn.txOutIndex, aUnspentTxOuts).amount;
 };
