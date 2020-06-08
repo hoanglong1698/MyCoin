@@ -1,1 +1,1 @@
-# MyCoin
+# MyCoins
